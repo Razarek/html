@@ -1,0 +1,51 @@
+body {
+  font-family: Arial, sans-serif;
+  margin: 0;
+  padding: 0;
+  background: #f5f5f5;
+}
+
+header {
+  background: #333;
+  color: #fff;
+  padding: 1em;
+  text-align: center;
+}
+
+main {
+  padding: 1em;
+}
+
+.hidden {
+  display: none;
+}
+
+#forum-controls {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1em;
+}
+
+#topic-form {
+  margin-bottom: 1em;
+}
+
+#topic-form input,
+#topic-form textarea {
+  width: 100%;
+  margin-bottom: 0.5em;
+}
+
+.topic {
+  background: #fff;
+  padding: 1em;
+  margin-bottom: 1em;
+  border-radius: 4px;
+  box-shadow: 0 0 3px rgba(0,0,0,0.1);
+}
+
+.meta {
+  font-size: 0.8em;
+  color: #666;
+}

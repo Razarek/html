@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Chem's Magazine Forum</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header>
+    <h1>Chem's Magazine Forum</h1>
+  </header>
+  <main id="app">
+    <section id="login-section">
+      <h2>Connexion</h2>
+      <form id="login-form">
+        <label>Nom d'utilisateur:
+          <input type="text" id="username" required>
+        </label>
+        <label>Rôle:
+          <select id="role">
+            <option value="user">Utilisateur</option>
+            <option value="admin">Administrateur</option>
+          </select>
+        </label>
+        <button type="submit">Se connecter</button>
+      </form>
+    </section>
+
+    <section id="forum-section" class="hidden">
+      <div id="forum-controls">
+        <span id="welcome"></span>
+        <button id="logout-button">Déconnexion</button>
+      </div>
+      <h2>Forum</h2>
+      <form id="topic-form">
+        <input type="text" id="topic-title" placeholder="Titre" required>
+        <textarea id="topic-content" placeholder="Contenu" required></textarea>
+        <button type="submit">Créer un sujet</button>
+      </form>
+      <div id="topics"></div>
+    </section>
+  </main>
+  <script src="app.js"></script>
+</body>
+</html>
