@@ -1,112 +1,132 @@
-function $(selector) {
-  return document.querySelector(selector);
+const STORAGE_USER = 'chems_user';
+const STORAGE_TOPICS = 'chems_topics';
+
+const loginForm = document.getElementById('login-form');
+const loginName = document.getElementById('login-name');
+const loginRole = document.getElementById('login-role');
+const loginSection = document.getElementById('login-section');
+const forumSection = document.getElementById('forum-section');
+const adminSection = document.getElementById('admin-section');
+const topicForm = document.getElementById('topic-form');
+const topicTitle = document.getElementById('topic-title');
+const topicContent = document.getElementById('topic-content');
+const topicsDiv = document.getElementById('topics');
+const adminTopicsDiv = document.getElementById('admin-topics');
+const userInfo = document.getElementById('user-info');
+const logoutButton = document.getElementById('logout-button');
+
+function getUser() {
+  return JSON.parse(localStorage.getItem(STORAGE_USER));
 }
 
-const loginForm = $('#login-form');
-const forumSection = $('#forum-section');
-const loginSection = $('#login-section');
-const topicForm = $('#topic-form');
-const topicsDiv = $('#topics');
-
-const userStorageKey = 'chems_user';
-const topicsStorageKey = 'chems_topics';
-
-function loadUser() {
-  return JSON.parse(localStorage.getItem(userStorageKey));
-}
-
-function saveUser(user) {
-  localStorage.setItem(userStorageKey, JSON.stringify(user));
+function setUser(user) {
+  localStorage.setItem(STORAGE_USER, JSON.stringify(user));
 }
 
 function clearUser() {
-  localStorage.removeItem(userStorageKey);
+  localStorage.removeItem(STORAGE_USER);
 }
 
-function loadTopics() {
-  return JSON.parse(localStorage.getItem(topicsStorageKey)) || [];
+function getTopics() {
+  return JSON.parse(localStorage.getItem(STORAGE_TOPICS)) || [];
 }
 
-function saveTopics(topics) {
-  localStorage.setItem(topicsStorageKey, JSON.stringify(topics));
-}
-
-function showLogin() {
-  loginSection.classList.remove('hidden');
-  forumSection.classList.add('hidden');
-}
-
-function showForum() {
-  loginSection.classList.add('hidden');
-  forumSection.classList.remove('hidden');
+function setTopics(topics) {
+  localStorage.setItem(STORAGE_TOPICS, JSON.stringify(topics));
 }
 
 function renderTopics() {
-  const user = loadUser();
-  const topics = loadTopics();
+  const topics = getTopics();
   topicsDiv.innerHTML = '';
   if (topics.length === 0) {
     topicsDiv.innerHTML = '<p>Aucun sujet pour le moment.</p>';
     return;
   }
-  topics.forEach((topic, index) => {
+  topics.forEach(t => {
     const div = document.createElement('div');
     div.className = 'topic';
-    div.innerHTML = `<h3>${topic.title}</h3>\n      <p>${topic.content}</p>\n      <p class="meta">Par ${topic.author} le ${topic.date}</p>`;
-    if (user && user.role === 'admin') {
-      const delBtn = document.createElement('button');
-      delBtn.textContent = 'Supprimer';
-      delBtn.addEventListener('click', () => {
-        topics.splice(index, 1);
-        saveTopics(topics);
-        renderTopics();
-      });
-      div.appendChild(delBtn);
-    }
+    div.innerHTML = `<h3>${t.title}</h3><p>${t.content}</p><p class="meta">Par ${t.author} le ${t.date}</p>`;
     topicsDiv.appendChild(div);
   });
 }
 
-function init() {
-  const user = loadUser();
-  if (user) {
-    showForum();
-    $('#welcome').textContent = `Bienvenue ${user.username} (${user.role})`;
-    renderTopics();
-  } else {
-    showLogin();
+function renderAdminTopics() {
+  const user = getUser();
+  if (!user || user.role !== 'admin') {
+    adminSection.classList.add('hidden');
+    return;
   }
+  adminSection.classList.remove('hidden');
+  const topics = getTopics();
+  adminTopicsDiv.innerHTML = '';
+  if (topics.length === 0) {
+    adminTopicsDiv.innerHTML = '<p>Aucun sujet.</p>';
+    return;
+  }
+  topics.forEach((t, i) => {
+    const div = document.createElement('div');
+    div.className = 'topic';
+    div.innerHTML = `<strong>${t.title}</strong> - ${t.author} <button data-i="${i}">Supprimer</button>`;
+    adminTopicsDiv.appendChild(div);
+  });
+  adminTopicsDiv.querySelectorAll('button').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const idx = parseInt(btn.getAttribute('data-i'), 10);
+      const all = getTopics();
+      all.splice(idx, 1);
+      setTopics(all);
+      renderTopics();
+      renderAdminTopics();
+    });
+  });
 }
 
-loginForm.addEventListener('submit', (e) => {
-  e.preventDefault();
-  const username = $('#username').value.trim();
-  const role = $('#role').value;
-  if (username) {
-    saveUser({ username, role });
-    $('#username').value = '';
-    init();
+function updateUI() {
+  const user = getUser();
+  if (!user) {
+    loginSection.classList.remove('hidden');
+    forumSection.classList.add('hidden');
+    adminSection.classList.add('hidden');
+    userInfo.textContent = '';
+    logoutButton.classList.add('hidden');
+    return;
   }
+  loginSection.classList.add('hidden');
+  forumSection.classList.remove('hidden');
+  userInfo.textContent = `Bienvenue ${user.name} (${user.role})`;
+  logoutButton.classList.remove('hidden');
+  renderTopics();
+  renderAdminTopics();
+}
+
+loginForm.addEventListener('submit', e => {
+  e.preventDefault();
+  const name = loginName.value.trim();
+  const role = loginRole.value;
+  if (!name) return;
+  setUser({ name, role });
+  loginForm.reset();
+  updateUI();
 });
 
-$('#logout-button').addEventListener('click', () => {
+logoutButton.addEventListener('click', () => {
   clearUser();
-  init();
+  updateUI();
 });
 
-topicForm.addEventListener('submit', (e) => {
+topicForm.addEventListener('submit', e => {
   e.preventDefault();
-  const title = $('#topic-title').value.trim();
-  const content = $('#topic-content').value.trim();
-  if (title && content) {
-    const user = loadUser();
-    const topics = loadTopics();
-    const date = new Date().toLocaleString('fr-FR');
-    topics.push({ title, content, author: user.username, date });
-    saveTopics(topics);
-    topicForm.reset();
-    renderTopics();
-  }
+  const user = getUser();
+  const title = topicTitle.value.trim();
+  const content = topicContent.value.trim();
+  if (!user || !title || !content) return;
+  const all = getTopics();
+  const date = new Date().toLocaleString('fr-FR');
+  all.push({ title, content, author: user.name, date });
+  setTopics(all);
+  topicForm.reset();
+  renderTopics();
+  renderAdminTopics();
 });
 
-init();
+updateUI();

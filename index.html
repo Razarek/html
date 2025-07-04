@@ -2,42 +2,41 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
-  <title>Chem's Magazine Forum</title>
+  <title>Forum - Chem's Magazine</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
   <header>
-    <h1>Chem's Magazine Forum</h1>
+    <h1>Forum Chem's Magazine</h1>
+    <div id="user-info"></div>
+    <button id="logout-button" class="hidden">Déconnexion</button>
   </header>
-  <main id="app">
-    <section id="login-section">
+  <main>
+    <section id="login-section" class="panel">
       <h2>Connexion</h2>
       <form id="login-form">
-        <label>Nom d'utilisateur:
-          <input type="text" id="username" required>
-        </label>
-        <label>Rôle:
-          <select id="role">
-            <option value="user">Utilisateur</option>
-            <option value="admin">Administrateur</option>
-          </select>
-        </label>
+        <input type="text" id="login-name" placeholder="Nom d'utilisateur" required>
+        <select id="login-role">
+          <option value="user">Utilisateur</option>
+          <option value="admin">Administrateur</option>
+        </select>
         <button type="submit">Se connecter</button>
       </form>
     </section>
 
-    <section id="forum-section" class="hidden">
-      <div id="forum-controls">
-        <span id="welcome"></span>
-        <button id="logout-button">Déconnexion</button>
-      </div>
-      <h2>Forum</h2>
+    <section id="forum-section" class="panel hidden">
+      <h2>Créer un sujet</h2>
       <form id="topic-form">
         <input type="text" id="topic-title" placeholder="Titre" required>
         <textarea id="topic-content" placeholder="Contenu" required></textarea>
-        <button type="submit">Créer un sujet</button>
+        <button type="submit">Publier</button>
       </form>
       <div id="topics"></div>
+    </section>
+
+    <section id="admin-section" class="panel hidden">
+      <h2>Administration</h2>
+      <div id="admin-topics"></div>
     </section>
   </main>
   <script src="app.js"></script>
